@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8ed">
+  <meta name="description" content="Tomato Arcade — a cozy little corner for quick, free browser games.">
+  <title>Tomato Arcade — Play something fun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="Tomato Arcade home">
+      <span class="brand-mark" aria-hidden="true">🍅</span>
+      <span>tomato<span class="brand-light">arcade</span></span>
+    </a>
+    <nav class="top-nav" aria-label="Main navigation">
+      <a href="#games">Games</a>
+      <a href="#about">About</a>
+    </nav>
+    <a class="nav-cta" href="#games">Let's play <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main id="home">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="status-dot"></span> YOUR LITTLE CORNER OF FUN</p>
+        <h1 id="hero-title">Big fun.<br><span class="headline-accent">Tiny games.</span></h1>
+        <p class="hero-description">Take a break, pick a game, and see if you can beat your best. No downloads. Just good vibes.</p>
+        <a class="primary-button" href="#games">Find your next game <span aria-hidden="true">↓</span></a>
+        <div class="hero-note"><span aria-hidden="true">✨</span> Free to play · Made for quick breaks</div>
+      </div>
+      <div class="hero-art" aria-label="A cheerful tomato character ready to play">
+        <div class="sunburst"></div>
+        <div class="float-chip chip-one">✦ &nbsp;PLAY!</div>
+        <div class="float-chip chip-two">LEVEL UP ↑</div>
+        <div class="tomato-character" aria-hidden="true">
+          <span class="tomato-leaf">✿</span><span class="tomato-face">•ᴗ•</span>
+        </div>
+        <span class="sparkle sparkle-one">✦</span><span class="sparkle sparkle-two">✧</span>
+        <span class="hero-caption">your new best friend</span>
+      </div>
+    </section>
+
+    <section class="games-section" id="games" aria-labelledby="games-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">THE GAME SHELF</p><h2 id="games-title">Pick your <span>play.</span></h2></div>
+        <label class="search-box"><span aria-hidden="true">⌕</span><span class="visually-hidden">Search games</span><input id="game-search" type="search" placeholder="Find a game..." autocomplete="off"></label>
+      </div>
+      <div class="filters" role="group" aria-label="Filter games by category">
+        <button class="filter-chip active" type="button" data-filter="all" aria-pressed="true">All games <span>3</span></button>
+        <button class="filter-chip" type="button" data-filter="quick" aria-pressed="false">⚡ Quick play</button>
+        <button class="filter-chip" type="button" data-filter="puzzle" aria-pressed="false">🧠 Brainy</button>
+        <button class="filter-chip" type="button" data-filter="classic" aria-pressed="false">🕹️ Classics</button>
+      </div>
+      <div class="game-grid" id="game-grid">
+        <article class="game-card" data-category="quick" data-name="tomato tap click fast">
+          <div class="game-art art-tap"><span class="art-label">QUICK PLAY</span><span class="art-emoji" aria-hidden="true">🍅</span><span class="art-decoration">+1</span></div>
+          <div class="game-info"><div><h3>Tomato Tap</h3><p>How fast are those fingers?</p></div><span class="game-rating" aria-label="Easy">🍅</span></div>
+          <button class="play-button" type="button" data-game="tap">Play now <span aria-hidden="true">→</span></button>
+        </article>
+        <article class="game-card" data-category="puzzle" data-name="memory match cards brain puzzle">
+          <div class="game-art art-memory"><span class="art-label">BRAINY</span><span class="memory-tiles" aria-hidden="true"><i>🍋</i><i>?</i><i>🍓</i><i>?</i></span></div>
+          <div class="game-info"><div><h3>Memory Match</h3><p>Find all the matching pairs.</p></div><span class="game-rating" aria-label="Thinky">🧠</span></div>
+          <button class="play-button" type="button" data-game="memory">Play now <span aria-hidden="true">→</span></button>
+        </article>
+        <article class="game-card" data-category="classic" data-name="snaky snake classic arcade">
+          <div class="game-art art-snake"><span class="art-label">ARCADE CLASSIC</span><span class="snake-emoji" aria-hidden="true">🐍</span><span class="snake-food" aria-hidden="true">🍎</span></div>
+          <div class="game-info"><div><h3>Snaky</h3><p>Eat, grow, and don't bonk!</p></div><span class="game-rating" aria-label="Classic">🕹️</span></div>
+          <button class="play-button" type="button" data-game="snake">Play now <span aria-hidden="true">→</span></button>
+        </article>
+      </div>
+      <p class="no-results" id="no-results" hidden>No games found. Try another search! 🍅</p>
+    </section>
+
+    <section class="about-strip" id="about">
+      <div class="about-icon" aria-hidden="true">🎮</div>
+      <div><p class="eyebrow">A LITTLE ABOUT US</p><h2>Small games, <span>big smiles.</span></h2><p>Tomato Arcade is a tiny, friendly place to play. Pick a game, have a go, and come back whenever you need a happy little break.</p></div>
+      <a href="#games" class="text-link">Back to games <span aria-hidden="true">↑</span></a>
+    </section>
+  </main>
+
+  <footer><a class="brand footer-brand" href="#home"><span class="brand-mark" aria-hidden="true">🍅</span><span>tomato<span class="brand-light">arcade</span></span></a><p>Made with a little bit of 🍅 and a lot of fun.</p><span class="footer-year">© <span id="year"></span> Tomato Arcade</span></footer>
+
+  <dialog class="game-dialog" id="game-dialog" aria-labelledby="dialog-title">
+    <div class="dialog-header"><div><p class="eyebrow">TOMATO ARCADE</p><h2 id="dialog-title">Let's play!</h2></div><button class="close-button" id="close-game" type="button" aria-label="Close game">×</button></div>
+    <div class="game-stage" id="game-stage"></div>
+  </dialog>
+</body>
+</html>
