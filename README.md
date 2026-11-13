@@ -9,6 +9,7 @@ Open `index.html` in a browser. The games run right on the page:
 - **Tomato Tap** — tap as often as you can in 15 seconds.
 - **Memory Match** — find all four pairs.
 - **Snaky** — eat the apples with the arrow keys (or the on-screen buttons).
+- **Enemy Rush** — dodge silly enemies with four difficulty settings and 1,000 selectable, fictional blaster combinations.
 
 ## Put it online with GitHub Pages
 
@@ -20,7 +21,7 @@ Open `index.html` in a browser. The games run right on the page:
 ## Make it yours
 
 - Change the text and game cards in `index.html`.
-- Change colors, spacing, and layout in `styles.css`.
-- Add game behavior in `script.js`.
+- Change colors, spacing, and layout in `styles.css` (Enemy Rush styles are in `enemy-game.css`).
+- Add game behavior in `script.js` and `enemy-game.js`.
 
-This is an original design inspired by playful browser-game arcades. It does not use another site's branding or game assets.
+Enemy Rush is a lighthearted, fictional arcade game using simple shapes and make-believe blasters.
