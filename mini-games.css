@@ -1,0 +1,680 @@
+const dialog = document.querySelector('#game-dialog');
+const stage = document.querySelector('#game-stage');
+const title = document.querySelector('#dialog-title');
+let cleanupCurrentGame = () => {};
+
+const cards = [...document.querySelectorAll('.game-card')];
+const searchInput = document.querySelector('#game-search');
+const filterButtons = [...document.querySelectorAll('.filter-chip')];
+const noResults = document.querySelector('#no-results');
+let selectedCategory = 'all';
+
+function filterGames() {
+  const query = searchInput.value.trim().toLowerCase();
+  let visibleCount = 0;
+  cards.forEach((card) => {
+    const matchesCategory = selectedCategory === 'all' || card.dataset.category === selectedCategory;
+    const matchesSearch = card.dataset.name.includes(query) || card.querySelector('h3').textContent.toLowerCase().includes(query);
+    card.hidden = !(matchesCategory && matchesSearch);
+    if (!card.hidden) visibleCount += 1;
+  });
+  noResults.hidden = visibleCount > 0;
+}
+
+searchInput.addEventListener('input', filterGames);
+filterButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    selectedCategory = button.dataset.filter;
+    filterButtons.forEach((item) => {
+      const active = item === button;
+      item.classList.toggle('active', active);
+      item.setAttribute('aria-pressed', String(active));
+    });
+    filterGames();
+  });
+});
+
+document.querySelectorAll('[data-game]').forEach((button) => {
+  button.addEventListener('click', () => openGame(button.dataset.game));
+});
+document.querySelector('#close-game').addEventListener('click', closeGame);
+dialog.addEventListener('click', (event) => {
+  if (event.target === dialog) closeGame();
+});
+dialog.addEventListener('close', () => cleanupCurrentGame());
+document.querySelector('#year').textContent = new Date().getFullYear();
+
+function openGame(game) {
+  cleanupCurrentGame();
+  stage.replaceChildren();
+  if (game === 'tap') startTapGame();
+  if (game === 'memory') startMemoryGame();
+  if (game === 'snake') startSnakeGame();
+  if (game.startsWith('mini-')) startMiniGame(game);
+  if (!dialog.open) dialog.showModal();
+}
+
+function closeGame() {
+  if (dialog.open) dialog.close();
+}
+
+function setTitle(text) {
+  title.textContent = text;
+}
+
+function makeButton(text, onClick) {
+  const button = document.createElement('button');
+  button.className = 'game-primary';
+  button.type = 'button';
+  button.textContent = text;
+  button.addEventListener('click', onClick);
+  return button;
+}
+
+function startTapGame() {
+  setTitle('Tomato Tap');
+  const wrap = document.createElement('div');
+  wrap.className = 'tap-game';
+  wrap.innerHTML = '<p class="game-instructions">Tap the tomato as many times as you can before time runs out!</p><p class="tap-score">Score: <span>0</span></p><p class="tap-time">Ready when you are</p><button class="tap-target" type="button" aria-label="Tap the tomato">🍅</button><div class="tap-action"></div>';
+  stage.append(wrap);
+  const scoreText = wrap.querySelector('.tap-score span');
+  const timeText = wrap.querySelector('.tap-time');
+  const target = wrap.querySelector('.tap-target');
+  const action = wrap.querySelector('.tap-action');
+  let score = 0;
+  let remaining = 15;
+  let timer;
+  target.disabled = true;
+  action.append(makeButton('Start game', () => {
+    action.replaceChildren();
+    target.disabled = false;
+    timeText.textContent = `${remaining} seconds left`;
+    timer = window.setInterval(() => {
+      remaining -= 1;
+      timeText.textContent = `${remaining} second${remaining === 1 ? '' : 's'} left`;
+      if (remaining <= 0) {
+        window.clearInterval(timer);
+        target.disabled = true;
+        timeText.textContent = `Time's up! You scored ${score}.`;
+        action.append(makeButton('Play again', startTapGame));
+      }
+    }, 1000);
+  }));
+  target.addEventListener('click', () => {
+    score += 1;
+    scoreText.textContent = String(score);
+  });
+  cleanupCurrentGame = () => window.clearInterval(timer);
+}
+
+function startMemoryGame() {
+  setTitle('Memory Match');
+  const wrap = document.createElement('div');
+  wrap.className = 'memory-game';
+  wrap.innerHTML = '<p class="game-instructions">Turn over two cards at a time and find all the pairs.</p><p class="tap-time">Moves: <span class="move-count">0</span></p><div class="memory-board" aria-label="Memory cards"></div><p class="memory-message" aria-live="polite"></p>';
+  stage.append(wrap);
+  const board = wrap.querySelector('.memory-board');
+  const message = wrap.querySelector('.memory-message');
+  const moveCount = wrap.querySelector('.move-count');
+  const icons = ['🍋', '🍓', '🍇', '🍊', '🍋', '🍓', '🍇', '🍊'];
+  icons.sort(() => Math.random() - 0.5);
+  let first = null;
+  let locked = false;
+  let moves = 0;
+  let matched = 0;
+  let hideTimer;
+  const buttons = icons.map((icon, index) => {
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'memory-card';
+    card.textContent = '?';
+    card.setAttribute('aria-label', `Hidden card ${index + 1}`);
+    card.addEventListener('click', () => {
+      if (locked || card.classList.contains('matched') || card === first) return;
+      card.textContent = icon;
+      card.classList.add('revealed');
+      card.setAttribute('aria-label', icon);
+      if (!first) {
+        first = card;
+        return;
+      }
+      moves += 1;
+      moveCount.textContent = String(moves);
+      if (first.textContent === card.textContent) {
+        first.classList.add('matched');
+        card.classList.add('matched');
+        first = null;
+        matched += 2;
+        if (matched === icons.length) message.textContent = `You found them all in ${moves} moves! Great job! 🎉`;
+      } else {
+        locked = true;
+        const previous = first;
+        hideTimer = window.setTimeout(() => {
+          previous.textContent = '?';
+          previous.classList.remove('revealed');
+          previous.setAttribute('aria-label', 'Hidden card');
+          card.textContent = '?';
+          card.classList.remove('revealed');
+          card.setAttribute('aria-label', 'Hidden card');
+          first = null;
+          locked = false;
+        }, 750);
+      }
+    });
+    board.append(card);
+    return card;
+  });
+  cleanupCurrentGame = () => {
+    window.clearTimeout(hideTimer);
+    buttons.forEach((card) => card.replaceWith(card.cloneNode(true)));
+  };
+}
+
+function startSnakeGame() {
+  setTitle('Snaky');
+  const wrap = document.createElement('div');
+  wrap.className = 'snake-game';
+  wrap.innerHTML = '<p class="game-instructions">Use the arrow keys (or the buttons) to eat apples. Don\'t hit the walls or yourself!</p><p class="snake-status" aria-live="polite">Press Start to play. Score: <span>0</span></p><canvas class="snake-canvas" width="360" height="360" aria-label="Snake game board"></canvas><div class="snake-controls" aria-label="Touch controls"><button type="button" data-dir="up" aria-label="Up">↑</button><button type="button" data-dir="left" aria-label="Left">←</button><button type="button" data-dir="down" aria-label="Down">↓</button><button type="button" data-dir="right" aria-label="Right">→</button></div><div class="snake-action" style="margin-top:12px"></div>';
+  stage.append(wrap);
+  const canvas = wrap.querySelector('canvas');
+  const ctx = canvas.getContext('2d');
+  const status = wrap.querySelector('.snake-status');
+  const scoreText = status.querySelector('span');
+  const action = wrap.querySelector('.snake-action');
+  const cell = 18;
+  let snake;
+  let direction;
+  let nextDirection;
+  let apple;
+  let score;
+  let timer;
+  let running = false;
+
+  function draw() {
+    ctx.fillStyle = '#1f281e';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (!snake) return;
+    ctx.fillStyle = '#ff6750';
+    ctx.fillRect(apple.x * cell + 2, apple.y * cell + 2, cell - 4, cell - 4);
+    snake.forEach((part, index) => {
+      ctx.fillStyle = index === 0 ? '#b9f08f' : '#70bf67';
+      ctx.fillRect(part.x * cell + 1, part.y * cell + 1, cell - 2, cell - 2);
+    });
+  }
+
+  function placeApple() {
+    do {
+      apple = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
+    } while (snake.some((part) => part.x === apple.x && part.y === apple.y));
+  }
+
+  function endGame() {
+    running = false;
+    window.clearInterval(timer);
+    status.firstChild.textContent = `Game over! Score: ${score} · `;
+    action.replaceChildren(makeButton('Play again', start));
+  }
+
+  function step() {
+    direction = nextDirection;
+    const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+    const eating = head.x === apple.x && head.y === apple.y;
+    if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.slice(0, eating ? undefined : -1).some((part) => part.x === head.x && part.y === head.y)) {
+      endGame();
+      return;
+    }
+    snake.unshift(head);
+    if (eating) {
+      score += 1;
+      scoreText.textContent = String(score);
+      placeApple();
+    } else {
+      snake.pop();
+    }
+    draw();
+  }
+
+  function turn(name) {
+    const directions = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
+    const proposed = directions[name];
+    if (proposed && (proposed.x !== -direction.x || proposed.y !== -direction.y)) nextDirection = proposed;
+  }
+
+  function onKey(event) {
+    const keys = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
+    if (keys[event.key] && dialog.open) {
+      event.preventDefault();
+      turn(keys[event.key]);
+    }
+  }
+
+  function start() {
+    window.clearInterval(timer);
+    snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+    direction = { x: 1, y: 0 };
+    nextDirection = direction;
+    score = 0;
+    scoreText.textContent = '0';
+    status.firstChild.textContent = 'Playing! Score: ';
+    action.replaceChildren();
+    running = true;
+    placeApple();
+    draw();
+    timer = window.setInterval(step, 125);
+  }
+
+  wrap.querySelectorAll('[data-dir]').forEach((button) => button.addEventListener('click', () => turn(button.dataset.dir)));
+  window.addEventListener('keydown', onKey);
+  action.append(makeButton('Start game', start));
+  draw();
+  cleanupCurrentGame = () => {
+    running = false;
+    window.clearInterval(timer);
+    window.removeEventListener('keydown', onKey);
+  };
+}
+
+function startMiniGame(id) {
+  const games = {
+    'mini-1': { title: 'Bubble Pop', type: 'bubble', time: 20, help: 'Tap the bubbles to score fastest.' },
+    'mini-2': { title: 'Color Match', type: 'color', time: 20, help: 'Match the target color as fast as you can.' },
+    'mini-3': { title: 'Dice Rush', type: 'dice', time: 20, help: 'Roll a 5 or 6 to keep your streak alive.' },
+    'mini-4': { title: 'Star Catch', type: 'catch', time: 22, help: 'Move the basket left and right to catch stars.' },
+    'mini-5': { title: 'Mole Tap', type: 'mole', time: 18, help: 'Tap the mole before it hides again.' },
+    'mini-6': { title: 'Number Blitz', type: 'number', time: 18, help: 'Pick the number shown in the challenge.' },
+    'mini-7': { title: 'Orbit Grab', type: 'orbit', time: 16, help: 'Click the glowing orb when it appears.' },
+    'mini-8': { title: 'Tile Slide', type: 'tile', time: 30, help: 'Tap the tiles in number order.' },
+    'mini-9': { title: 'Shape Sort', type: 'shape', time: 18, help: 'Match the target shape to score.' },
+    'mini-10': { title: 'Rainbow Dash', type: 'rainbow', time: 20, help: 'Choose the gate that matches the color.' }
+  };
+
+  const config = games[id];
+  if (!config) return;
+
+  setTitle(config.title);
+  const wrap = document.createElement('div');
+  wrap.className = 'mini-game';
+  wrap.innerHTML = '<p class="game-instructions">' + config.help + '</p><div class="mini-top"><span>Score: <b class="mini-score">0</b></span><span>Time: <b class="mini-time">' + config.time + '</b></span></div><div class="mini-board" aria-live="polite"></div><div class="mini-actions"></div>';
+  stage.append(wrap);
+
+  const board = wrap.querySelector('.mini-board');
+  const scoreEl = wrap.querySelector('.mini-score');
+  const timeEl = wrap.querySelector('.mini-time');
+  const actions = wrap.querySelector('.mini-actions');
+  let score = 0;
+  let seconds = config.time;
+  let timer;
+  let running = false;
+  let stepInterval;
+
+  const setScore = (value) => {
+    score = value;
+    scoreEl.textContent = String(score);
+  };
+
+  const stopEverything = () => {
+    running = false;
+    window.clearInterval(timer);
+    window.clearInterval(stepInterval);
+  };
+
+  const finish = (messageText) => {
+    stopEverything();
+    messageText = messageText || 'Time up!';
+    actions.innerHTML = '<p class="mini-finish">' + messageText + '</p>';
+    const replay = makeButton('Play again', () => startMiniGame(id));
+    actions.appendChild(replay);
+  };
+
+  function attachStartButton() {
+    actions.innerHTML = '';
+    actions.appendChild(makeButton('Start game', beginGame));
+  }
+
+  function beginGame() {
+    stopEverything();
+    running = true;
+    seconds = config.time;
+    setScore(0);
+    timeEl.textContent = String(seconds);
+    actions.innerHTML = '';
+    board.innerHTML = '';
+
+    if (config.type === 'bubble') {
+      const bubbleCount = 12;
+      const bubbleButtons = [];
+      for (let i = 0; i < bubbleCount; i++) {
+        const bubble = document.createElement('button');
+        bubble.type = 'button';
+        bubble.className = 'mini-bubble-button';
+        bubble.textContent = '•';
+        bubble.style.left = `${Math.random() * 72 + 8}%`;
+        bubble.style.top = `${Math.random() * 65 + 10}%`;
+        bubble.addEventListener('click', () => {
+          if (!running) return;
+          setScore(score + 1);
+          bubble.style.left = `${Math.random() * 72 + 8}%`;
+          bubble.style.top = `${Math.random() * 62 + 10}%`;
+        });
+        board.appendChild(bubble);
+        bubbleButtons.push(bubble);
+      }
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Pop time! Final score: ' + score + '.');
+      }, 1000);
+    }
+
+    if (config.type === 'color') {
+      const target = ['red', 'blue', 'green', 'gold'][Math.floor(Math.random() * 4)];
+      const targetText = document.createElement('div');
+      targetText.className = 'mini-target';
+      targetText.textContent = 'Target: ' + target.toUpperCase();
+      targetText.style.color = target === 'red' ? '#ff5d5d' : target === 'blue' ? '#5ba7ff' : target === 'green' ? '#53d898' : '#f5bd3d';
+      board.appendChild(targetText);
+      const colors = [
+        { name: 'red', value: '#ff5d5d' },
+        { name: 'blue', value: '#5ba7ff' },
+        { name: 'green', value: '#53d898' },
+        { name: 'gold', value: '#f5bd3d' }
+      ];
+      colors.forEach((item) => {
+        const choice = document.createElement('button');
+        choice.type = 'button';
+        choice.className = 'mini-choice-color';
+        choice.style.background = item.value;
+        choice.addEventListener('click', () => {
+          if (!running) return;
+          if (item.name === target) {
+            setScore(score + 1);
+            const newTarget = colors[Math.floor(Math.random() * colors.length)].name;
+            targetText.textContent = 'Target: ' + newTarget.toUpperCase();
+            targetText.style.color = newTarget === 'red' ? '#ff5d5d' : newTarget === 'blue' ? '#5ba7ff' : newTarget === 'green' ? '#53d898' : '#f5bd3d';
+          } else {
+            finish('Wrong color! Final score: ' + score + '.');
+          }
+        });
+        board.appendChild(choice);
+      });
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Time up! Final score: ' + score + '.');
+      }, 1000);
+    }
+
+    if (config.type === 'dice') {
+      const results = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+      const rollDisplay = document.createElement('div');
+      rollDisplay.className = 'mini-dice-display';
+      rollDisplay.textContent = '🎲';
+      board.appendChild(rollDisplay);
+
+      const rollButton = makeButton('Roll', () => {
+        if (!running) return;
+        const value = Math.floor(Math.random() * 6) + 1;
+        rollDisplay.textContent = results[value - 1];
+        if (value >= 5) {
+          setScore(score + 1);
+        } else {
+          setScore(Math.max(0, score - 1));
+        }
+      });
+      actions.appendChild(rollButton);
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Dice done! Final score: ' + score + '.');
+      }, 1000);
+    }
+
+    if (config.type === 'catch') {
+      const basket = document.createElement('div');
+      basket.className = 'mini-basket';
+      basket.style.left = '200px';
+      board.appendChild(basket);
+      let basketPos = 200;
+      const stars = [];
+      const moveLeft = () => { basketPos = Math.max(5, basketPos - 22); basket.style.left = basketPos + 'px'; };
+      const moveRight = () => { basketPos = Math.min(340, basketPos + 22); basket.style.left = basketPos + 'px'; };
+      const leftButton = makeButton('←', moveLeft);
+      const rightButton = makeButton('→', moveRight);
+      actions.append(leftButton, rightButton);
+      stepInterval = window.setInterval(() => {
+        if (!running) return;
+        const star = document.createElement('div');
+        star.className = 'mini-star-fall';
+        star.textContent = '⭐';
+        const starX = Math.random() * 320 + 20;
+        star.style.left = starX + 'px';
+        star.style.top = '0px';
+        board.appendChild(star);
+        stars.push(star);
+        const fall = window.setInterval(() => {
+          if (!running) return;
+          const top = Number.parseInt(star.style.top || '0', 10) + 8;
+          star.style.top = top + 'px';
+          if (top > 180 && Math.abs(starX - basketPos) < 42) {
+            clearInterval(fall);
+            star.remove();
+            setScore(score + 1);
+          } else if (top > 220) {
+            clearInterval(fall);
+            star.remove();
+          }
+        }, 80);
+      }, 700);
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Basket time! Final score: ' + score + '.');
+      }, 1000);
+    }
+
+    if (config.type === 'mole') {
+      const grid = Array.from({ length: 9 }, (_, i) => {
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'mini-mole-cell';
+        cell.textContent = '•';
+        cell.addEventListener('click', () => {
+          if (!running || !cell.classList.contains('active')) return;
+          setScore(score + 1);
+          cell.classList.remove('active');
+          cell.textContent = '•';
+        });
+        board.appendChild(cell);
+        return cell;
+      });
+      let current = -1;
+      stepInterval = window.setInterval(() => {
+        if (!running) return;
+        if (current >= 0) {
+          grid[current].classList.remove('active');
+          grid[current].textContent = '•';
+        }
+        current = Math.floor(Math.random() * 9);
+        grid[current].classList.add('active');
+        grid[current].textContent = '🐹';
+      }, 600);
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Mole round complete! Final score: ' + score + '.');
+      }, 1000);
+    }
+
+    if (config.type === 'number') {
+      const digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
+      let target = digits[Math.floor(Math.random() * digits.length)];
+      const targetDisplay = document.createElement('div');
+      targetDisplay.className = 'mini-target';
+      targetDisplay.textContent = 'Target: ' + target;
+      board.appendChild(targetDisplay);
+      digits.forEach((digit) => {
+        const choice = document.createElement('button');
+        choice.type = 'button';
+        choice.className = 'mini-choice-digit';
+        choice.textContent = digit;
+        choice.addEventListener('click', () => {
+          if (!running) return;
+          if (digit === target) {
+            setScore(score + 1);
+            target = digits[Math.floor(Math.random() * digits.length)];
+            targetDisplay.textContent = 'Target: ' + target;
+          } else {
+            finish('Wrong number! Final score: ' + score + '.');
+          }
+        });
+        board.appendChild(choice);
+      });
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Number blitz! Final score: ' + score + '.');
+      }, 1000);
+    }
+
+    if (config.type === 'orbit') {
+      const orb = document.createElement('button');
+      orb.type = 'button';
+      orb.className = 'mini-orb';
+      orb.textContent = '✦';
+      board.appendChild(orb);
+      let x = 160;
+      let y = 80;
+      let dx = 2.6;
+      let dy = 1.8;
+      const moveOrb = () => {
+        if (!running) return;
+        x += dx;
+        y += dy;
+        if (x < 30 || x > 300) dx *= -1;
+        if (y < 30 || y > 165) dy *= -1;
+        orb.style.left = x + 'px';
+        orb.style.top = y + 'px';
+      };
+      orb.addEventListener('click', () => {
+        if (!running) return;
+        setScore(score + 1);
+        x = 40 + Math.random() * 260;
+        y = 40 + Math.random() * 110;
+        orb.style.left = x + 'px';
+        orb.style.top = y + 'px';
+      });
+      stepInterval = window.setInterval(moveOrb, 30);
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Orbit complete! Final score: ' + score + '.');
+      }, 1000);
+    }
+
+    if (config.type === 'tile') {
+      const order = [1, 2, 3, 4, 5, 6, 7, 8];
+      const tiles = [];
+      let next = 1;
+      order.forEach((value) => {
+        const tile = document.createElement('button');
+        tile.type = 'button';
+        tile.className = 'mini-tile';
+        tile.textContent = String(value);
+        tile.addEventListener('click', () => {
+          if (!running) return;
+          if (Number(tile.textContent) === next) {
+            setScore(score + 1);
+            next += 1;
+            tile.classList.add('done');
+            tile.disabled = true;
+            if (next > 8) finish('Finished! Final score: ' + score + '.');
+          } else {
+            finish('Oops! Final score: ' + score + '.');
+          }
+        });
+        board.appendChild(tile);
+        tiles.push(tile);
+      });
+      tiles.sort(() => Math.random() - 0.5);
+      board.innerHTML = '';
+      tiles.forEach((tile) => board.appendChild(tile));
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Tile time! Final score: ' + score + '.');
+      }, 1000);
+    }
+
+    if (config.type === 'shape') {
+      const shapeMap = ['🔷', '🔺', '⬢', '⬣', '🔶'];
+      let target = shapeMap[Math.floor(Math.random() * shapeMap.length)];
+      const targetText = document.createElement('div');
+      targetText.className = 'mini-target';
+      targetText.textContent = 'Target: ' + target;
+      board.appendChild(targetText);
+      shapeMap.forEach((shape) => {
+        const choice = document.createElement('button');
+        choice.type = 'button';
+        choice.className = 'mini-shape-choice';
+        choice.textContent = shape;
+        choice.addEventListener('click', () => {
+          if (!running) return;
+          if (shape === target) {
+            setScore(score + 1);
+            target = shapeMap[Math.floor(Math.random() * shapeMap.length)];
+            targetText.textContent = 'Target: ' + target;
+          } else {
+            finish('Wrong shape! Final score: ' + score + '.');
+          }
+        });
+        board.appendChild(choice);
+      });
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Shape sort done! Final score: ' + score + '.');
+      }, 1000);
+    }
+
+    if (config.type === 'rainbow') {
+      const gates = ['red', 'blue', 'green', 'purple', 'gold'];
+      const target = gates[Math.floor(Math.random() * gates.length)];
+      const targetText = document.createElement('div');
+      targetText.className = 'mini-target';
+      targetText.textContent = 'Pass the ' + target + ' gate';
+      targetText.style.color = target === 'red' ? '#ff5d5d' : target === 'blue' ? '#5ba7ff' : target === 'green' ? '#53d898' : target === 'purple' ? '#b492ff' : '#f5bd3d';
+      board.appendChild(targetText);
+      gates.forEach((gate) => {
+        const gateButton = document.createElement('button');
+        gateButton.type = 'button';
+        gateButton.className = 'mini-rainbow-gate';
+        gateButton.textContent = gate.toUpperCase();
+        gateButton.style.background = gate === 'red' ? '#ff5d5d' : gate === 'blue' ? '#5ba7ff' : gate === 'green' ? '#53d898' : gate === 'purple' ? '#b492ff' : '#f5bd3d';
+        gateButton.addEventListener('click', () => {
+          if (!running) return;
+          if (gate === target) {
+            setScore(score + 1);
+            const nextTarget = gates[Math.floor(Math.random() * gates.length)];
+            targetText.textContent = 'Pass the ' + nextTarget + ' gate';
+            targetText.style.color = nextTarget === 'red' ? '#ff5d5d' : nextTarget === 'blue' ? '#5ba7ff' : nextTarget === 'green' ? '#53d898' : nextTarget === 'purple' ? '#b492ff' : '#f5bd3d';
+          } else {
+            finish('Wrong gate! Final score: ' + score + '.');
+          }
+        });
+        board.appendChild(gateButton);
+      });
+      timer = window.setInterval(() => {
+        seconds -= 1;
+        timeEl.textContent = String(seconds);
+        if (seconds <= 0) finish('Rainbow dash complete! Final score: ' + score + '.');
+      }, 1000);
+    }
+  }
+
+  attachStartButton();
+  cleanupCurrentGame = () => {
+    stopEverything();
+    actions.innerHTML = '';
+    board.innerHTML = '';
+  };
+}
