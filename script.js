@@ -96,11 +96,13 @@ function startTapGame() {
         window.clearInterval(timer);
         target.disabled = true;
         timeText.textContent = `Time's up! You scored ${score}.`;
+        window.dispatchEvent(new CustomEvent('tomato:score', { detail: { game: 'Tomato Tap', score } }));
         action.append(makeButton('Play again', startTapGame));
       }
     }, 1000);
   }));
   target.addEventListener('click', () => {
+    if (target.disabled) return;
     score += 1;
     scoreText.textContent = String(score);
   });
@@ -123,7 +125,7 @@ function startMemoryGame() {
   let moves = 0;
   let matched = 0;
   let hideTimer;
-  const buttons = icons.map((icon, index) => {
+  icons.forEach((icon, index) => {
     const card = document.createElement('button');
     card.type = 'button';
     card.className = 'memory-card';
@@ -134,40 +136,27 @@ function startMemoryGame() {
       card.textContent = icon;
       card.classList.add('revealed');
       card.setAttribute('aria-label', icon);
-      if (!first) {
-        first = card;
-        return;
-      }
+      if (!first) { first = card; return; }
       moves += 1;
       moveCount.textContent = String(moves);
       if (first.textContent === card.textContent) {
-        first.classList.add('matched');
-        card.classList.add('matched');
-        first = null;
-        matched += 2;
-        if (matched === icons.length) message.textContent = `You found them all in ${moves} moves! Great job! 🎉`;
+        first.classList.add('matched'); card.classList.add('matched'); first = null; matched += 2;
+        if (matched === icons.length) {
+          message.textContent = `You found them all in ${moves} moves! Great job! 🎉`;
+          window.dispatchEvent(new CustomEvent('tomato:score', { detail: { game: 'Memory Match', score: Math.max(1, 100 - moves) } }));
+        }
       } else {
         locked = true;
         const previous = first;
         hideTimer = window.setTimeout(() => {
-          previous.textContent = '?';
-          previous.classList.remove('revealed');
-          previous.setAttribute('aria-label', 'Hidden card');
-          card.textContent = '?';
-          card.classList.remove('revealed');
-          card.setAttribute('aria-label', 'Hidden card');
-          first = null;
-          locked = false;
+          previous.textContent = '?'; previous.classList.remove('revealed'); previous.setAttribute('aria-label', 'Hidden card');
+          card.textContent = '?'; card.classList.remove('revealed'); card.setAttribute('aria-label', 'Hidden card'); first = null; locked = false;
         }, 750);
       }
     });
     board.append(card);
-    return card;
   });
-  cleanupCurrentGame = () => {
-    window.clearTimeout(hideTimer);
-    buttons.forEach((card) => card.replaceWith(card.cloneNode(true)));
-  };
+  cleanupCurrentGame = () => window.clearTimeout(hideTimer);
 }
 
 function startSnakeGame() {
@@ -182,94 +171,55 @@ function startSnakeGame() {
   const scoreText = status.querySelector('span');
   const action = wrap.querySelector('.snake-action');
   const cell = 18;
-  let snake;
-  let direction;
-  let nextDirection;
-  let apple;
-  let score;
-  let timer;
-  let running = false;
+  let snake, direction, nextDirection, apple, score, timer;
 
   function draw() {
-    ctx.fillStyle = '#1f281e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#1f281e'; ctx.fillRect(0, 0, canvas.width, canvas.height);
     if (!snake) return;
-    ctx.fillStyle = '#ff6750';
-    ctx.fillRect(apple.x * cell + 2, apple.y * cell + 2, cell - 4, cell - 4);
-    snake.forEach((part, index) => {
-      ctx.fillStyle = index === 0 ? '#b9f08f' : '#70bf67';
-      ctx.fillRect(part.x * cell + 1, part.y * cell + 1, cell - 2, cell - 2);
-    });
+    ctx.fillStyle = '#ff6750'; ctx.fillRect(apple.x * cell + 2, apple.y * cell + 2, cell - 4, cell - 4);
+    snake.forEach((part, index) => { ctx.fillStyle = index === 0 ? '#b9f08f' : '#70bf67'; ctx.fillRect(part.x * cell + 1, part.y * cell + 1, cell - 2, cell - 2); });
   }
-
   function placeApple() {
-    do {
-      apple = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) };
-    } while (snake.some((part) => part.x === apple.x && part.y === apple.y));
+    do { apple = { x: Math.floor(Math.random() * 20), y: Math.floor(Math.random() * 20) }; }
+    while (snake.some((part) => part.x === apple.x && part.y === apple.y));
   }
-
   function endGame() {
-    running = false;
     window.clearInterval(timer);
     status.firstChild.textContent = `Game over! Score: ${score} · `;
+    window.dispatchEvent(new CustomEvent('tomato:score', { detail: { game: 'Snaky', score } }));
     action.replaceChildren(makeButton('Play again', start));
   }
-
   function step() {
     direction = nextDirection;
     const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
     const eating = head.x === apple.x && head.y === apple.y;
-    if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.slice(0, eating ? undefined : -1).some((part) => part.x === head.x && part.y === head.y)) {
-      endGame();
-      return;
-    }
+    if (head.x < 0 || head.x >= 20 || head.y < 0 || head.y >= 20 || snake.slice(0, eating ? undefined : -1).some((part) => part.x === head.x && part.y === head.y)) { endGame(); return; }
     snake.unshift(head);
-    if (eating) {
-      score += 1;
-      scoreText.textContent = String(score);
-      placeApple();
-    } else {
-      snake.pop();
-    }
+    if (eating) { score += 1; scoreText.textContent = String(score); placeApple(); } else snake.pop();
     draw();
   }
-
   function turn(name) {
     const directions = { up: { x: 0, y: -1 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 }, right: { x: 1, y: 0 } };
     const proposed = directions[name];
     if (proposed && (proposed.x !== -direction.x || proposed.y !== -direction.y)) nextDirection = proposed;
   }
-
   function onKey(event) {
     const keys = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
-    if (keys[event.key] && dialog.open) {
-      event.preventDefault();
-      turn(keys[event.key]);
-    }
+    if (keys[event.key] && dialog.open) { event.preventDefault(); turn(keys[event.key]); }
   }
-
   function start() {
     window.clearInterval(timer);
-    snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
-    direction = { x: 1, y: 0 };
-    nextDirection = direction;
-    score = 0;
-    scoreText.textContent = '0';
-    status.firstChild.textContent = 'Playing! Score: ';
-    action.replaceChildren();
-    running = true;
-    placeApple();
-    draw();
-    timer = window.setInterval(step, 125);
+    snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }]; direction = { x: 1, y: 0 }; nextDirection = direction;
+    score = 0; scoreText.textContent = '0'; status.firstChild.textContent = 'Playing! Score: '; action.replaceChildren(); placeApple(); draw(); timer = window.setInterval(step, 125);
   }
-
   wrap.querySelectorAll('[data-dir]').forEach((button) => button.addEventListener('click', () => turn(button.dataset.dir)));
   window.addEventListener('keydown', onKey);
-  action.append(makeButton('Start game', start));
-  draw();
-  cleanupCurrentGame = () => {
-    running = false;
-    window.clearInterval(timer);
-    window.removeEventListener('keydown', onKey);
-  };
+  action.append(makeButton('Start game', start)); draw();
+  cleanupCurrentGame = () => { window.clearInterval(timer); window.removeEventListener('keydown', onKey); };
 }
+
+// Load the optional racing game after the main arcade has initialized.
+const racingScript = document.createElement('script');
+racingScript.src = new URL('racing-game.js', document.currentScript.src).href;
+racingScript.defer = true;
+document.head.append(racingScript);
