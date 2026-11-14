@@ -11,8 +11,10 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fredoka:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="enemy-game.css">
+  <link rel="stylesheet" href="parkour-game.css">
   <script src="script.js" defer></script>
   <script src="enemy-game.js" defer></script>
+  <script src="parkour-game.js" defer></script>
 </head>
 <body>
   <header class="topbar">
@@ -22,23 +24,18 @@
   </header>
   <main id="home">
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-copy">
-        <p class="eyebrow"><span class="status-dot"></span> YOUR LITTLE CORNER OF FUN</p>
-        <h1 id="hero-title">Big fun.<br><span class="headline-accent">Tiny games.</span></h1>
-        <p class="hero-description">Take a break, pick a game, and see if you can beat your best. No downloads. Just good vibes.</p>
-        <a class="primary-button" href="#games">Find your next game <span aria-hidden="true">↓</span></a>
-        <div class="hero-note"><span aria-hidden="true">✨</span> Free to play · Made for quick breaks</div>
-      </div>
+      <div class="hero-copy"><p class="eyebrow"><span class="status-dot"></span> YOUR LITTLE CORNER OF FUN</p><h1 id="hero-title">Big fun.<br><span class="headline-accent">Tiny games.</span></h1><p class="hero-description">Take a break, pick a game, and see if you can beat your best. No downloads. Just good vibes.</p><a class="primary-button" href="#games">Find your next game <span aria-hidden="true">↓</span></a><div class="hero-note"><span aria-hidden="true">✨</span> Free to play · Made for quick breaks</div></div>
       <div class="hero-art" aria-label="A cheerful tomato character ready to play"><div class="sunburst"></div><div class="float-chip chip-one">✦ &nbsp;PLAY!</div><div class="float-chip chip-two">LEVEL UP ↑</div><div class="tomato-character" aria-hidden="true"><span class="tomato-leaf">✿</span><span class="tomato-face">•ᴗ•</span></div><span class="sparkle sparkle-one">✦</span><span class="sparkle sparkle-two">✧</span><span class="hero-caption">your new best friend</span></div>
     </section>
     <section class="games-section" id="games" aria-labelledby="games-title">
       <div class="section-heading"><div><p class="eyebrow">THE GAME SHELF</p><h2 id="games-title">Pick your <span>play.</span></h2></div><label class="search-box"><span aria-hidden="true">⌕</span><span class="visually-hidden">Search games</span><input id="game-search" type="search" placeholder="Find a game..." autocomplete="off"></label></div>
-      <div class="filters" role="group" aria-label="Filter games by category"><button class="filter-chip active" type="button" data-filter="all" aria-pressed="true">All games <span>4</span></button><button class="filter-chip" type="button" data-filter="quick" aria-pressed="false">⚡ Quick play</button><button class="filter-chip" type="button" data-filter="puzzle" aria-pressed="false">🧠 Brainy</button><button class="filter-chip" type="button" data-filter="classic" aria-pressed="false">🕹️ Classics</button></div>
+      <div class="filters" role="group" aria-label="Filter games by category"><button class="filter-chip active" type="button" data-filter="all" aria-pressed="true">All games <span>5</span></button><button class="filter-chip" type="button" data-filter="quick" aria-pressed="false">⚡ Quick play</button><button class="filter-chip" type="button" data-filter="puzzle" aria-pressed="false">🧠 Brainy</button><button class="filter-chip" type="button" data-filter="classic" aria-pressed="false">🕹️ Classics</button></div>
       <div class="game-grid" id="game-grid">
         <article class="game-card" data-category="quick" data-name="tomato tap click fast"><div class="game-art art-tap"><span class="art-label">QUICK PLAY</span><span class="art-emoji" aria-hidden="true">🍅</span><span class="art-decoration">+1</span></div><div class="game-info"><div><h3>Tomato Tap</h3><p>How fast are those fingers?</p></div><span class="game-rating" aria-label="Easy">🍅</span></div><button class="play-button" type="button" data-game="tap">Play now <span aria-hidden="true">→</span></button></article>
         <article class="game-card" data-category="puzzle" data-name="memory match cards brain puzzle"><div class="game-art art-memory"><span class="art-label">BRAINY</span><span class="memory-tiles" aria-hidden="true"><i>🍋</i><i>?</i><i>🍓</i><i>?</i></span></div><div class="game-info"><div><h3>Memory Match</h3><p>Find all the matching pairs.</p></div><span class="game-rating" aria-label="Thinky">🧠</span></div><button class="play-button" type="button" data-game="memory">Play now <span aria-hidden="true">→</span></button></article>
         <article class="game-card" data-category="classic" data-name="snaky snake classic arcade"><div class="game-art art-snake"><span class="art-label">ARCADE CLASSIC</span><span class="snake-emoji" aria-hidden="true">🐍</span><span class="snake-food" aria-hidden="true">🍎</span></div><div class="game-info"><div><h3>Snaky</h3><p>Eat, grow, and don't bonk!</p></div><span class="game-rating" aria-label="Classic">🕹️</span></div><button class="play-button" type="button" data-game="snake">Play now <span aria-hidden="true">→</span></button></article>
         <article class="game-card" data-category="quick" data-name="enemy rush enemies blaster arcade action"><div class="game-art art-enemies"><span class="art-label">WAVE SURVIVAL</span><span class="enemy-art-icon" aria-hidden="true">👾</span><span class="enemy-art-spark" aria-hidden="true">✨</span></div><div class="game-info"><div><h3>Enemy Rush</h3><p>Dodge the baddies, pick a blaster!</p></div><span class="game-rating" aria-label="Action game">⚡</span></div><button class="play-button" type="button" data-game="enemies">Play now <span aria-hidden="true">→</span></button></article>
+        <article class="game-card" data-category="classic" data-name="3d parkour jump runner platforms adventure"><div class="game-art art-parkour"><span class="art-label">3D PARKOUR</span><span class="parkour-art-icon" aria-hidden="true">🏃</span><span class="parkour-art-block" aria-hidden="true">🟪</span></div><div class="game-info"><div><h3>Skyline Parkour</h3><p>Jump rooftops and grab stars!</p></div><span class="game-rating" aria-label="Adventure">🌟</span></div><button class="play-button" type="button" data-game="parkour">Play now <span aria-hidden="true">→</span></button></article>
       </div>
       <p class="no-results" id="no-results" hidden>No games found. Try another search! 🍅</p>
     </section>

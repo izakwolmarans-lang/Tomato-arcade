@@ -1,27 +1,26 @@
 # Tomato Arcade 🍅
 
-A small, friendly gaming website made with plain HTML, CSS, and JavaScript. No build tools or installation needed.
+A small browser-game website built with HTML, CSS, and JavaScript. No build tools are needed.
 
-## Run it
+## Play locally
 
-Open `index.html` in a browser. The games run right on the page:
+Open `index.html` in a browser. The games run on the page:
 
-- **Tomato Tap** — tap as often as you can in 15 seconds.
-- **Memory Match** — find all four pairs.
-- **Snaky** — eat the apples with the arrow keys (or the on-screen buttons).
-- **Enemy Rush** — dodge silly enemies with four difficulty settings and 1,000 selectable, fictional blaster combinations.
+- **Tomato Tap** — tap quickly for 15 seconds.
+- **Memory Match** — find all four matching pairs.
+- **Snaky** — eat apples with the arrow keys.
+- **Enemy Rush** — dodge silly enemies with four difficulties and 1,000 fictional blaster combinations.
+- **Skyline Parkour** — jump rooftop obstacles, dodge gaps, and collect stars. Use arrow keys/A-D and Space on a computer, or the on-screen buttons on a tablet.
 
-## Put it online with GitHub Pages
+## Publish with GitHub Pages
 
-1. Open this repository on GitHub and go to **Settings → Pages**.
+1. Open the repository **Settings → Pages**.
 2. Under **Build and deployment**, choose **Deploy from a branch**.
 3. Choose the `main` branch and `/ (root)`, then click **Save**.
-4. After GitHub finishes publishing, the Pages address will appear in that section.
+4. After GitHub finishes publishing, its website link appears on that Pages screen.
 
 ## Make it yours
 
-- Change the text and game cards in `index.html`.
-- Change colors, spacing, and layout in `styles.css` (Enemy Rush styles are in `enemy-game.css`).
-- Add game behavior in `script.js` and `enemy-game.js`.
-
-Enemy Rush is a lighthearted, fictional arcade game using simple shapes and make-believe blasters.
+- Edit game cards and text in `index.html`.
+- Change appearance in `styles.css`, `enemy-game.css`, and `parkour-game.css`.
+- Game code is in `script.js`, `enemy-game.js`, and `parkour-game.js`.
