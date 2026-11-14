@@ -1,14 +1,10 @@
 # Tomato Arcade 🍅
 
-A small browser-game website built with HTML, CSS, and JavaScript. No build tools are needed.
+A small browser-game website built with HTML, CSS, and JavaScript. No build tools or installation needed.
 
-## Run the site
+Open `index.html` in a browser to play. The game shelf includes Tomato Tap, Memory Match, Snaky, Enemy Rush and Skyline Parkour, plus ten classic-style mini-games: Tic-Tac-Toe, Pong, Breakout, Whack-a-Mole, Simon Says, Rock Paper Scissors, Number Guess, Reaction Test, Connect Four, and Cookie Clicker. The page also features a friendly crew of non-tomato characters.
 
-Open `index.html` in a browser, or publish the repository with GitHub Pages.
-
-Tomato Turbo is an original, simplified pseudo-3D arcade racing game inspired by the general lane-racing genre. It does not copy Apex Racer or another game's branding, artwork, cars, tracks, or code. Use arrow keys/A-D on desktop or the on-screen steering buttons on a tablet. Dodge traffic and collect coins; your distance and coins contribute to the local leaderboard.
-
-The local player profile and leaderboard are saved only in the current browser and device. They are not real secure accounts and are not shared online.
+Most games work on desktop and tablets; touch controls are available for the games that need them. Scores and player profiles are local to the browser and are not shared online.
 
 ## Publish with GitHub Pages
 
