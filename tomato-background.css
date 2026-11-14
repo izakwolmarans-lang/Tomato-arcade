@@ -1,0 +1,5 @@
+/* A gentle tomato pattern behind the arcade content. CSS-drawn so it needs no image download. */
+body{position:relative;background-color:#fffaf2;background-image:radial-gradient(ellipse at 50% 50%,#fffdf9 0 42%,#fff8ed 43% 100%);background-size:100% 100%;background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.10;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cg transform='translate(15 14)'%3E%3Cpath fill='%234b9b58' d='M48 20c-4-10-2-16 5-20 1 9 0 15-5 20zm2 0c3-10 9-14 17-13-5 8-10 12-17 13zm-3 0c-7-8-13-9-20-5 7 6 13 8 20 5z'/%3E%3Cpath fill='%23ef5945' d='M47 19c-10-8-25-3-31 6-10 14-7 38 5 51 9 10 18 12 27 9 10 3 19 1 28-9 12-13 15-37 5-51-7-9-21-14-31-6l-2 2z'/%3E%3Cpath fill='%23ff9b7e' opacity='.7' d='M28 34c-6 10-5 21 0 28 3-10 5-18 12-25-5-3-8-4-12-3z'/%3E%3C/g%3E%3C/svg%3E");background-repeat:repeat;background-size:128px 128px}
+.topbar,main,footer{position:relative;z-index:1}
+@media(prefers-reduced-motion:reduce){body::before{background-attachment:scroll}}
