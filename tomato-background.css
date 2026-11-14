@@ -3,3 +3,20 @@ body{position:relative;background-color:#fffaf2;background-image:radial-gradient
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.10;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' viewBox='0 0 128 128'%3E%3Cg transform='translate(15 14)'%3E%3Cpath fill='%234b9b58' d='M48 20c-4-10-2-16 5-20 1 9 0 15-5 20zm2 0c3-10 9-14 17-13-5 8-10 12-17 13zm-3 0c-7-8-13-9-20-5 7 6 13 8 20 5z'/%3E%3Cpath fill='%23ef5945' d='M47 19c-10-8-25-3-31 6-10 14-7 38 5 51 9 10 18 12 27 9 10 3 19 1 28-9 12-13 15-37 5-51-7-9-21-14-31-6l-2 2z'/%3E%3Cpath fill='%23ff9b7e' opacity='.7' d='M28 34c-6 10-5 21 0 28 3-10 5-18 12-25-5-3-8-4-12-3z'/%3E%3C/g%3E%3C/svg%3E");background-repeat:repeat;background-size:128px 128px}
 .topbar,main,footer{position:relative;z-index:1}
 @media(prefers-reduced-motion:reduce){body::before{background-attachment:scroll}}
+
+/* Give every game more room on desktop and tablets. Keep the dialog scrollable on small screens. */
+.game-dialog{width:min(1100px,96vw);max-width:96vw;max-height:96vh;margin:auto;overflow:auto}
+.game-dialog .game-stage{width:100%;min-height:60vh;padding:clamp(16px,3vw,34px);max-height:none;overflow:visible}
+.game-dialog .enemy-rush,.game-dialog .parkour-game,.game-dialog .racing-game,.game-dialog .three-game,.game-dialog .classic-game,.game-dialog .mini-game{width:min(100%,1000px);margin-inline:auto}
+.game-dialog .enemy-canvas,.game-dialog .parkour-canvas,.game-dialog .racing-canvas,.game-dialog .three-canvas,.game-dialog .classic-canvas{width:100%;max-width:960px;margin-inline:auto}
+.game-dialog .memory-board{grid-template-columns:repeat(4,minmax(64px,86px));gap:12px}
+.game-dialog .memory-card{width:100%;height:82px;font-size:32px}
+.game-dialog .tap-target{width:170px;height:170px;font-size:84px}
+.game-dialog .snake-controls button,.game-dialog .parkour-controls button,.game-dialog .racing-controls button{min-width:76px;min-height:58px;font-size:18px}
+@media(max-width:700px){
+  .game-dialog{width:98vw;max-width:98vw;max-height:96vh;border-radius:16px}
+  .game-dialog .game-stage{min-height:55vh;padding:14px}
+  .game-dialog .memory-board{grid-template-columns:repeat(4,minmax(48px,68px));gap:8px}
+  .game-dialog .memory-card{height:64px;font-size:25px}
+  .game-dialog .tap-target{width:145px;height:145px;font-size:72px}
+}
