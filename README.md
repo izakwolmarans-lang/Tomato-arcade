@@ -2,13 +2,6 @@
 
 A small browser-game website built with HTML, CSS, and JavaScript. No build tools or installation needed.
 
-Open `index.html` in a browser to play. The game shelf includes Tomato Tap, Memory Match, Snaky, Enemy Rush and Skyline Parkour, plus ten classic-style mini-games: Tic-Tac-Toe, Pong, Breakout, Whack-a-Mole, Simon Says, Rock Paper Scissors, Number Guess, Reaction Test, Connect Four, and Cookie Clicker. The page also features a friendly crew of non-tomato characters.
+Open `index.html` in a browser, or publish with GitHub Pages from **Settings → Pages** by deploying `main` and `/ (root)`.
 
-Most games work on desktop and tablets; touch controls are available for the games that need them. Scores and player profiles are local to the browser and are not shared online.
-
-## Publish with GitHub Pages
-
-1. Open repository **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Choose `main` and `/(root)`, then click **Save**.
-4. After publishing, GitHub shows the site URL on the Pages screen.
+The arcade includes several small browser games. **Cosmic Blaster** is a fictional, colorful pseudo-3D target game: aim with mouse or touch and tap cartoon space critters. It uses no realistic weapon imagery. Profiles and leaderboard scores are stored locally in the current browser and are not shared online.
